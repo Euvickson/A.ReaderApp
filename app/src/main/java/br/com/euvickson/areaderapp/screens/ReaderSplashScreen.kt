@@ -26,11 +26,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import br.com.euvickson.areaderapp.components.ReaderLogo
+import br.com.euvickson.areaderapp.navigation.ReaderScreens
 import kotlinx.coroutines.delay
 
-@Preview
 @Composable
-fun ReaderSplashScreen(navController: NavController = NavController(context = LocalContext.current)) {
+fun ReaderSplashScreen(navController: NavController) {
 
     val scale = remember {
         androidx.compose.animation.core.Animatable(initialValue = 0f)
@@ -40,6 +41,9 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
             OvershootInterpolator(8f).getInterpolation(it)
         }))
         delay(2000L)
+
+        navController.navigate(ReaderScreens.LoginScreen.name)
+
     }
 
     Surface(
@@ -56,7 +60,7 @@ fun ReaderSplashScreen(navController: NavController = NavController(context = Lo
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = "A. Reader", style = MaterialTheme.typography.displayMedium, color = Color.Red.copy(alpha = 0.5f))
+            ReaderLogo()
             Spacer(modifier = Modifier.height(15.dp))
             Text(text = "\"Read. Change. Yourself\"", style = MaterialTheme.typography.bodyLarge, color = Color.LightGray)
         }

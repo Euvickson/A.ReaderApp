@@ -5,6 +5,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import br.com.euvickson.areaderapp.screens.ReaderSplashScreen
+import br.com.euvickson.areaderapp.screens.details.BookDetailsScreen
+import br.com.euvickson.areaderapp.screens.home.Home
+import br.com.euvickson.areaderapp.screens.login.ReaderLoginScreen
+import br.com.euvickson.areaderapp.screens.serach.SearchScreen
+import br.com.euvickson.areaderapp.screens.stats.ReaderStatsScreen
+import br.com.euvickson.areaderapp.screens.update.BookUpdateScreen
 
 @Composable
 fun ReaderNavigation() {
@@ -17,27 +23,27 @@ fun ReaderNavigation() {
         }
 
         composable(ReaderScreens.ReaderHomeScreen.name) {
-            ReaderSplashScreen(navController = navController)
+            Home(navController = navController)
         }
 
         composable(ReaderScreens.SearchScreen.name) {
-            ReaderSplashScreen(navController = navController)
+            SearchScreen(navController = navController)
         }
 
         composable(ReaderScreens.LoginScreen.name) {
-            ReaderSplashScreen(navController = navController)
+            ReaderLoginScreen(navController = navController)
         }
 
         composable(ReaderScreens.DetailScreen.name) {
-            ReaderSplashScreen(navController = navController)
+            BookDetailsScreen(navController = navController)
         }
 
         composable(ReaderScreens.UpdateScreen.name) {
-            ReaderSplashScreen(navController = navController)
+            BookUpdateScreen(navController = navController)
         }
 
         composable(ReaderScreens.ReaderStatsScreen.name) {
-            ReaderSplashScreen(navController = navController)
+            ReaderStatsScreen(navController = navController)
         }
 
     }
