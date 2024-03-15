@@ -1,5 +1,6 @@
 package br.com.euvickson.areaderapp.screens.login
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,11 +19,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import br.com.euvickson.areaderapp.components.EmailInput
+import br.com.euvickson.areaderapp.components.PasswordInput
 import br.com.euvickson.areaderapp.components.ReaderLogo
 
 
@@ -35,6 +38,9 @@ fun ReaderLoginScreen(navController: NavHostController) {
             verticalArrangement = Arrangement.Top
         ) {
             ReaderLogo()
+            UserForm(loading = false, isCreateAccount = false) {email, password ->
+                Log.d("Form", "ReaderLoginScreen: $email $password")
+            }
         }
     }
 }
@@ -42,7 +48,11 @@ fun ReaderLoginScreen(navController: NavHostController) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Preview
 @Composable
-fun UserForm() {
+fun UserForm(
+    loading: Boolean = false,
+    isCreateAccount: Boolean = false,
+    onDone: (String, String) -> Unit = {email, password ->}
+) {
     //rememberSaveable it's not gonna loose the value even if the phone is rotated and such, so it's good to use, so the user do not loose info during the app
     val email = rememberSaveable { mutableStateOf("") }
     val password = rememberSaveable { mutableStateOf("") }
@@ -59,12 +69,26 @@ fun UserForm() {
         .verticalScroll(rememberScrollState())
 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+
         EmailInput(
             emailState = email,
-            enabled = true,
+            enabled = !loading,
             onAction = KeyboardActions {
                 passwordFocusRequest.requestFocus()
             }
         )
+
+        PasswordInput(
+            modifier = Modifier.focusRequester(passwordFocusRequest),
+            passwordState = password,
+            labelId = "Password",
+            enabled = !loading,
+            passwordVisibility = passwordVisibility,
+            onAction = KeyboardActions{
+                if(!valid) return@KeyboardActions
+                onDone(email.value.trim(), password.value.trim())
+            }
+        )
     }
 }
+
