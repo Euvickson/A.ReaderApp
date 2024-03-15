@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,14 +22,18 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import br.com.euvickson.areaderapp.components.EmailInput
 import br.com.euvickson.areaderapp.components.ReaderLogo
 
 
 @Composable
 fun ReaderLoginScreen(navController: NavHostController) {
 
-    Surface (modifier = Modifier.fillMaxSize()){
-        Column (horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top){
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Top
+        ) {
             ReaderLogo()
         }
     }
@@ -44,7 +49,7 @@ fun UserForm() {
     val passwordVisibility = rememberSaveable { mutableStateOf(false) }
     val passwordFocusRequest = FocusRequester.Default
     val keyboardController = LocalSoftwareKeyboardController.current
-    val valid = remember (email.value, password.value) {
+    val valid = remember(email.value, password.value) {
         email.value.trim().isNotEmpty() && password.value.trim().isNotEmpty()
     }
 
@@ -53,8 +58,13 @@ fun UserForm() {
         .background(MaterialTheme.colorScheme.background)
         .verticalScroll(rememberScrollState())
 
-    Column (modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        EmailInput(
+            emailState = email,
+            enabled = true,
+            onAction = KeyboardActions {
+                passwordFocusRequest.requestFocus()
+            }
+        )
     }
 }
-
