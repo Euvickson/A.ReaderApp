@@ -5,12 +5,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +45,7 @@ fun ReaderLoginScreen(navController: NavHostController) {
             verticalArrangement = Arrangement.Top
         ) {
             ReaderLogo()
-            UserForm(loading = false, isCreateAccount = false) {email, password ->
+            UserForm(loading = false, isCreateAccount = false) { email, password ->
                 Log.d("Form", "ReaderLoginScreen: $email $password")
             }
         }
@@ -51,7 +58,7 @@ fun ReaderLoginScreen(navController: NavHostController) {
 fun UserForm(
     loading: Boolean = false,
     isCreateAccount: Boolean = false,
-    onDone: (String, String) -> Unit = {email, password ->}
+    onDone: (String, String) -> Unit = { email, password -> }
 ) {
     //rememberSaveable it's not gonna loose the value even if the phone is rotated and such, so it's good to use, so the user do not loose info during the app
     val email = rememberSaveable { mutableStateOf("") }
@@ -84,11 +91,44 @@ fun UserForm(
             labelId = "Password",
             enabled = !loading,
             passwordVisibility = passwordVisibility,
-            onAction = KeyboardActions{
-                if(!valid) return@KeyboardActions
+            onAction = KeyboardActions {
+                if (!valid) return@KeyboardActions
                 onDone(email.value.trim(), password.value.trim())
             }
         )
+
+        SubmitButton(
+            textId = if (isCreateAccount) "Create Account" else "Login",
+            loading = loading,
+            validInputs = valid
+        ) {
+            onDone(email.value.trim(), password.value.trim())
+            keyboardController?.hide()
+        }
     }
+}
+
+@Composable
+fun SubmitButton(
+    textId: String,
+    loading: Boolean,
+    validInputs: Boolean,
+    onClick: () -> Unit
+) {
+
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .padding(3.dp)
+            .fillMaxWidth(),
+        enabled = !loading && validInputs,
+        shape = CircleShape
+    ) {
+        if (loading) CircularProgressIndicator(modifier = Modifier.size(25.dp)) else Text(
+            text = textId,
+            modifier = Modifier.padding(5.dp)
+        )
+    }
+
 }
 
