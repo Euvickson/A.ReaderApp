@@ -2,8 +2,11 @@ package br.com.euvickson.areaderapp.screens.login
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,9 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import br.com.euvickson.areaderapp.R
 import br.com.euvickson.areaderapp.components.EmailInput
 import br.com.euvickson.areaderapp.components.PasswordInput
 import br.com.euvickson.areaderapp.components.ReaderLogo
@@ -39,26 +45,46 @@ import br.com.euvickson.areaderapp.components.ReaderLogo
 @Composable
 fun ReaderLoginScreen(navController: NavHostController) {
 
+    val showLoginForm = rememberSaveable { mutableStateOf(true) }
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Top
         ) {
             ReaderLogo()
-            UserForm(loading = false, isCreateAccount = false) { email, password ->
-                Log.d("Form", "ReaderLoginScreen: $email $password")
+            if (showLoginForm.value) UserForm(loading = false, isCreateAccount = false) { email, password ->
+                //Todo: Login FB Account
             }
+            else UserForm(loading = false, isCreateAccount = true) {email, password ->
+                //Todo: create FB Account
+            }
+        }
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        Row(
+            modifier = Modifier.padding(15.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            val text = if (showLoginForm.value) "Sign up" else "Login"
+            Text(text = "New User?")
+            Text(text, modifier = Modifier
+                .clickable {
+                    showLoginForm.value = !showLoginForm.value
+                }
+                .padding(start = 5.dp), fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.secondary)
         }
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
-@Preview
 @Composable
 fun UserForm(
     loading: Boolean = false,
     isCreateAccount: Boolean = false,
-    onDone: (String, String) -> Unit = { email, password -> }
+    onDone: (String, String) -> Unit
 ) {
     //rememberSaveable it's not gonna loose the value even if the phone is rotated and such, so it's good to use, so the user do not loose info during the app
     val email = rememberSaveable { mutableStateOf("") }
@@ -76,6 +102,8 @@ fun UserForm(
         .verticalScroll(rememberScrollState())
 
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+
+        if (isCreateAccount) Text(text = stringResource(id = R.string.create_acct), modifier = Modifier.padding(4.dp)) else Text(text = "")
 
         EmailInput(
             emailState = email,
