@@ -40,10 +40,11 @@ import br.com.euvickson.areaderapp.R
 import br.com.euvickson.areaderapp.components.EmailInput
 import br.com.euvickson.areaderapp.components.PasswordInput
 import br.com.euvickson.areaderapp.components.ReaderLogo
+import br.com.euvickson.areaderapp.navigation.ReaderScreens
 
 
 @Composable
-fun ReaderLoginScreen(navController: NavHostController) {
+fun ReaderLoginScreen(navController: NavHostController, viewModel: LoginScreenViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
 
     val showLoginForm = rememberSaveable { mutableStateOf(true) }
 
@@ -55,6 +56,9 @@ fun ReaderLoginScreen(navController: NavHostController) {
             ReaderLogo()
             if (showLoginForm.value) UserForm(loading = false, isCreateAccount = false) { email, password ->
                 //Todo: Login FB Account
+                viewModel.signInWithEmailAndPassword(email, password) {
+                    navController.navigate(ReaderScreens.ReaderHomeScreen.name)
+                }
             }
             else UserForm(loading = false, isCreateAccount = true) {email, password ->
                 //Todo: create FB Account
