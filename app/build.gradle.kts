@@ -74,6 +74,9 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
+    //Material Icons Core
+    implementation("androidx.compose.material:material-icons-extended:$1.6.4")
+
     //Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.4"))
 
