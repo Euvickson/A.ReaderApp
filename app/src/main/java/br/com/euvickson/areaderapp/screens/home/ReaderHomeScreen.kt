@@ -1,5 +1,7 @@
 package br.com.euvickson.areaderapp.screens.home
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -27,11 +29,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import br.com.euvickson.areaderapp.model.MBook
 import br.com.euvickson.areaderapp.navigation.ReaderScreens
 import com.google.firebase.auth.FirebaseAuth
 
@@ -41,20 +46,35 @@ fun Home(navController: NavHostController) {
 
     Scaffold(
         topBar = {
-                 ReaderAppBar(title = "A.Reader", navController = navController)
+            ReaderAppBar(title = "A.Reader", navController = navController)
         },
         floatingActionButton = {
-            FABContent {}
+            FABContent {
+
+            }
         },
 
         ) {
         Surface(
             Modifier
                 .fillMaxSize()
-                .padding(it)) {
-
+                .padding(it)
+        ) {
+            HomeContent(navController = navController)
         }
 
+    }
+}
+
+@Composable
+fun HomeContent(navController: NavController) {
+    Column(
+        modifier = Modifier.padding(2.dp),
+        verticalArrangement = Arrangement.SpaceEvenly
+    ){
+        Row (modifier = Modifier.align(alignment = Alignment.Start)){
+            TitleSection(label = "Your reading \n " + "activity right now")
+        }
     }
 }
 
@@ -68,39 +88,61 @@ fun ReaderAppBar(
 
     TopAppBar(
         title = {
-                Row (verticalAlignment = Alignment.CenterVertically){
-                    if (showProfile) {
-                        Icon(
-                            imageVector = Icons.Default.Favorite,
-                            contentDescription = "Logo Icon",
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(12.dp))
-                                .scale(0.9f)
-                        )
-                    }
-                    Text(
-                        text = title,
-                        color = Color.Red,
-                        style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (showProfile) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Logo Icon",
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(12.dp))
+                            .scale(0.9f)
                     )
-                    
-                    Spacer(modifier = Modifier.width(150.dp))
-
                 }
+                Text(
+                    text = title,
+                    color = Color.Red,
+                    style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                )
+
+                Spacer(modifier = Modifier.width(150.dp))
+
+            }
         },
         actions = {
-                  IconButton(onClick = {
-                      FirebaseAuth.getInstance().signOut().run {
-                          navController.navigate(ReaderScreens.LoginScreen.name)
-                      }
-                  }) {
-                      Icon(imageVector = Icons.Filled.Logout, contentDescription = "Logout", tint = MaterialTheme.colorScheme.tertiary)
-                  }
+            IconButton(onClick = {
+                FirebaseAuth.getInstance().signOut().run {
+                    navController.navigate(ReaderScreens.LoginScreen.name)
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Logout,
+                    contentDescription = "Logout",
+                    tint = MaterialTheme.colorScheme.tertiary
+                )
+            }
         },
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = Color.Transparent)
     )
 
 }
+
+@Composable
+fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
+
+}
+
+@Composable
+fun TitleSection(modifier: Modifier = Modifier, label: String) {
+    Surface(modifier = modifier.padding(start = 5.dp, top = 1.dp)) {
+        Column {
+            Text(text = label,
+                fontSize = 19.sp,
+                fontStyle = FontStyle.Normal,
+                textAlign = TextAlign.Left)
+        }
+    }
+}
+
 @Composable
 fun FABContent(onTap: () -> Unit) {
     FloatingActionButton(
