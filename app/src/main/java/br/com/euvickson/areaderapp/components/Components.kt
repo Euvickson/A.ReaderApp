@@ -312,13 +312,13 @@ fun ListCard(
 
             }
 
-            Text(text = "Book title",
+            Text(text = book.title.toString(),
                 modifier = Modifier.padding(4.dp),
                 fontWeight = FontWeight.Bold,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis)
 
-            Text(text = "Authors: All...",
+            Text(text = book.authors.toString(),
                 modifier = Modifier.padding(4.dp),
                 style = MaterialTheme.typography.labelMedium)
 

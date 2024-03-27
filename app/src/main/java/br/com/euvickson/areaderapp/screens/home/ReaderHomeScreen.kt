@@ -1,5 +1,6 @@
 package br.com.euvickson.areaderapp.screens.home
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,8 +8,13 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Divider
@@ -63,6 +69,40 @@ fun Home(navController: NavHostController) {
 @Composable
 fun HomeContent(navController: NavController) {
 
+    val listOfBooks = listOf(
+        MBook(
+            id = "dafa",
+            title = "Hello Again",
+            authors = "All of Us",
+            notes = null
+        ),
+        MBook(
+            id = "dafa",
+            title = "Hello Again",
+            authors = "All of Us",
+            notes = null
+        ),
+        MBook(
+            id = "dafa",
+            title = "Hello Again",
+            authors = "All of Us",
+            notes = null
+        ),
+        MBook(
+            id = "dafa",
+            title = "Hello Again",
+            authors = "All of Us",
+            notes = null
+        ),
+        MBook(
+            id = "dafa",
+            title = "Hello Again",
+            authors = "All of Us",
+            notes = null
+        ),
+
+    )
+
     val currentUserName = if (!FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
         FirebaseAuth.getInstance().currentUser?.email?.split("@")?.get(0)
     } else {
@@ -102,11 +142,40 @@ fun HomeContent(navController: NavController) {
 
         }
 
-        ReadingRightNowArea(books = listOf(), navController = navController)
+        ListCard()
+
+        ReadingRightNowArea(books = listOfBooks, navController = navController)
     }
 }
 
 @Composable
 fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
-    ListCard()
+    TitleSection(label = "Reading List")
+    BookListArea(listOfBooks = books, navController = navController)
+}
+
+@Composable
+fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
+    HorizontalScrollableComponent(listOfBooks) {
+        Log.d("TAG", "BookListArea: $it")
+        //Todo: On Card Clicked, navigate to Details
+    }
+}
+
+@Composable
+fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (String) -> Unit) {
+    val scrollState = rememberLazyListState()
+
+    LazyRow (modifier = Modifier
+        .fillMaxWidth()
+        .height(280.dp),
+        state = scrollState) {
+
+        items(listOfBooks) {book ->
+            ListCard(book) {
+                onCardPressed(it)
+            }
+        }
+    }
+
 }
