@@ -49,7 +49,10 @@ import br.com.euvickson.areaderapp.components.ReaderAppBar
 import br.com.euvickson.areaderapp.components.TitleSection
 import br.com.euvickson.areaderapp.model.MBook
 import br.com.euvickson.areaderapp.navigation.ReaderScreens
+import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.compose.rememberImagePainter
 import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -160,14 +163,16 @@ fun ListCard(
         Column (modifier = Modifier.width(screenWidth.dp - (spacing * 2)), horizontalAlignment = Alignment.Start){
 
             Row (horizontalArrangement = Arrangement.Center) {
+
                 Image(
-                    painter = rememberAsyncImagePainter(model = ""),
+                    painter = rememberAsyncImagePainter(model = "http://books.google.com/books/content?id=-1y8CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"),
                     contentDescription = "book image",
                     modifier = Modifier
                         .height(140.dp)
                         .width(100.dp)
                         .padding(4.dp)
                 )
+
                 Spacer(modifier = Modifier.width(50.dp))
                 
                 Column(
