@@ -3,6 +3,7 @@ package br.com.euvickson.areaderapp.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -176,8 +178,10 @@ fun TitleSection(modifier: Modifier = Modifier, label: String) {
 @Composable
 fun ReaderAppBar(
     title: String,
+    icon: ImageVector? = null,
     showProfile: Boolean = true,
-    navController: NavController
+    navController: NavController,
+    onBackArrowClicked: () -> Unit = {}
 ) {
 
     TopAppBar(
@@ -192,13 +196,24 @@ fun ReaderAppBar(
                             .scale(0.9f)
                     )
                 }
+
+                if (icon != null) {
+                    Icon(imageVector = icon, contentDescription = "Arrow Back",
+                        tint = Color.Red,
+                        modifier = Modifier.clickable {
+                            onBackArrowClicked.invoke()
+                        })
+                    Spacer(modifier = Modifier.width(40.dp))
+                } else {
+                    Spacer(modifier = Modifier.width(130.dp))
+                }
+
                 Text(
                     text = title,
                     color = Color.Red,
                     style = TextStyle(fontWeight = FontWeight.Bold, fontSize = 20.sp)
                 )
 
-                Spacer(modifier = Modifier.width(150.dp))
 
             }
         },
@@ -208,11 +223,13 @@ fun ReaderAppBar(
                     navController.navigate(ReaderScreens.LoginScreen.name)
                 }
             }) {
-                Icon(
-                    imageVector = Icons.Filled.Logout,
-                    contentDescription = "Logout",
-                    tint = MaterialTheme.colorScheme.tertiary
-                )
+                if (showProfile) Row () {
+                    Icon(
+                        imageVector = Icons.Filled.Logout,
+                        contentDescription = "Logout",
+                        tint = MaterialTheme.colorScheme.tertiary
+                    )
+                } else Box {}
             }
         },
         colors = TopAppBarDefaults.largeTopAppBarColors(containerColor = Color.Transparent)
