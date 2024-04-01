@@ -1,4 +1,4 @@
-package br.com.euvickson.areaderapp.screens.serach
+package br.com.euvickson.areaderapp.screens.search
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -41,7 +41,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import br.com.euvickson.areaderapp.components.InputField
 import br.com.euvickson.areaderapp.components.ReaderAppBar
-import br.com.euvickson.areaderapp.model.MBook
+import br.com.euvickson.areaderapp.model.Item
 import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,11 +69,13 @@ fun SearchScreen(navController: NavHostController, viewModel: BookSearchViewMode
                         .fillMaxWidth()
                         .padding(16.dp),
                     viewModel
-                ) {query ->
-                    viewModel.searchBooks(query)
+                ) {searchQuery ->
+                    viewModel.searchBooks(searchQuery)
                 }
 
-                BookList(navController = navController)
+                BookList(
+                    navController = navController,
+                )
 
             }
         }
@@ -83,11 +85,13 @@ fun SearchScreen(navController: NavHostController, viewModel: BookSearchViewMode
 
 @Composable
 fun BookList(
-    bookList: List<MBook> = emptyList(),
-    navController: NavHostController
+    navController: NavHostController,
+    viewModel: BookSearchViewModel = hiltViewModel()
 ) {
+    val listOfBooks = viewModel.list
+
     LazyColumn (modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)){
-        items(bookList) { book ->
+        items(listOfBooks) { book ->
             BookItem(book) {
                 Log.d("TAG", "BookList: $book")
             }
@@ -96,7 +100,7 @@ fun BookList(
 }
 
 @Composable
-fun BookItem(mBook: MBook, onItemClicked: () -> Unit) {
+fun BookItem(book: Item, onItemClicked: () -> Unit) {
     Card (
         elevation = CardDefaults.cardElevation(8.dp),
         modifier = Modifier
@@ -105,8 +109,9 @@ fun BookItem(mBook: MBook, onItemClicked: () -> Unit) {
             .clickable { onItemClicked.invoke() },
     ){
         Row (horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
+            val imageUrl: String = book.volumeInfo.imageLinks.smallThumbnail.ifEmpty { "http://books.google.com/books/content?id=-1y8CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api" }
             Image(
-                painter = rememberAsyncImagePainter(model = "http://books.google.com/books/content?id=-1y8CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"),
+                painter = rememberAsyncImagePainter(model = imageUrl),
                 contentDescription = "Image",
                 modifier = Modifier
                     .height(100.dp)
@@ -115,10 +120,10 @@ fun BookItem(mBook: MBook, onItemClicked: () -> Unit) {
             )
 
             Column (horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center) {
-                Text(text = mBook.title.toString(), style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = "Author: ${mBook.authors.toString()}", style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.padding(start = 4.dp))
-                Text(text = mBook.notes.toString(), style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = mBook.notes.toString(), style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = book.volumeInfo.title, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = "Author: ${book.volumeInfo.authors}", style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.padding(start = 4.dp))
+                Text(text = book.volumeInfo.publishedDate, style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = book.volumeInfo.language, style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
 
         }

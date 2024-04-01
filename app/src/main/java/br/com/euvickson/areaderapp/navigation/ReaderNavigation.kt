@@ -1,6 +1,7 @@
 package br.com.euvickson.areaderapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -8,7 +9,8 @@ import br.com.euvickson.areaderapp.screens.ReaderSplashScreen
 import br.com.euvickson.areaderapp.screens.details.BookDetailsScreen
 import br.com.euvickson.areaderapp.screens.home.Home
 import br.com.euvickson.areaderapp.screens.login.ReaderLoginScreen
-import br.com.euvickson.areaderapp.screens.serach.SearchScreen
+import br.com.euvickson.areaderapp.screens.search.BookSearchViewModel
+import br.com.euvickson.areaderapp.screens.search.SearchScreen
 import br.com.euvickson.areaderapp.screens.stats.ReaderStatsScreen
 import br.com.euvickson.areaderapp.screens.update.BookUpdateScreen
 
@@ -27,7 +29,8 @@ fun ReaderNavigation() {
         }
 
         composable(ReaderScreens.SearchScreen.name) {
-            SearchScreen(navController = navController)
+            val searchViewModel = hiltViewModel<BookSearchViewModel>()
+            SearchScreen(navController = navController, viewModel = searchViewModel)
         }
 
         composable(ReaderScreens.LoginScreen.name) {

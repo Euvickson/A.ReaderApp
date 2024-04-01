@@ -1,39 +1,32 @@
 package br.com.euvickson.areaderapp.repository
 
-import android.util.Log
-import br.com.euvickson.areaderapp.data.DataOrException
-import br.com.euvickson.areaderapp.model.Book
+import br.com.euvickson.areaderapp.data.Resource
 import br.com.euvickson.areaderapp.model.Item
 import br.com.euvickson.areaderapp.network.BooksApi
 import javax.inject.Inject
 
 class BookRepository @Inject constructor(private val api: BooksApi) {
-
-    private val dataOrException = DataOrException<List<Item>, Boolean, Exception>()
-    private var bookInfoDataOrException = DataOrException<Item, Boolean, Exception>()
-    suspend fun getBooks(searchQuerry: String): DataOrException<List<Item>, Boolean, Exception> {
-        try {
-            dataOrException.loading = true
-            dataOrException.data = api.getAllBooks(searchQuerry).items
-            if (dataOrException.data!!.isNotEmpty()) dataOrException.loading = false
-        }catch (e: Exception) {
-            dataOrException.e = e
+    suspend fun getBooks(searchQuerry: String): Resource<List<Item>> {
+        return try {
+            Resource.Loading(data = true)
+            val itemList = api.getAllBooks(searchQuerry).items
+            if (itemList.isNotEmpty()) Resource.Loading(data = false)
+            Resource.Success(data = itemList)
+        } catch (e: Exception) {
+            Resource.Error(message = e.message.toString())
         }
-
-        return dataOrException
     }
 
-    suspend fun getBookInfo(bookid: String) {
-        try {
-            dataOrException.loading = true
-            bookInfoDataOrException.data = api.getBookInfo(bookid)
-            if (bookInfoDataOrException.data.toString().isNotEmpty()) bookInfoDataOrException.loading = false
+    suspend fun getBookInfo(bookid: String): Resource<Item> {
+        val response = try {
+            Resource.Loading(data = true)
+            api.getBookInfo(bookid)
         } catch (e: Exception) {
-            bookInfoDataOrException.e = e
-            bookInfoDataOrException.loading = false
-            Log.d("TAG", "getBookInfo: $e")
+            return Resource.Error(message = "An error occured ${e.message.toString()}")
         }
 
+        Resource.Loading(data = false)
+        return Resource.Success(data = response)
     }
 
 }
