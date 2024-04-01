@@ -1,6 +1,7 @@
 package br.com.euvickson.areaderapp.di
 
 import br.com.euvickson.areaderapp.network.BooksApi
+import br.com.euvickson.areaderapp.repository.BookRepository
 import br.com.euvickson.areaderapp.utils.Constants.BASE_URL
 import dagger.Module
 import dagger.Provides
@@ -23,4 +24,8 @@ object AppModule {
             .build()
             .create(BooksApi::class.java)
     }
+
+    @Singleton
+    @Provides
+    fun provideBookRepository(api: BooksApi) = BookRepository(api)
 }

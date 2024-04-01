@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import br.com.euvickson.areaderapp.components.InputField
 import br.com.euvickson.areaderapp.components.ReaderAppBar
@@ -45,41 +46,7 @@ import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavHostController) {
-
-    val listOfBooks = listOf(
-        MBook(
-            id = "dafa",
-            title = "Hello Again Hello Again Hello Again Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-
-        )
+fun SearchScreen(navController: NavHostController, viewModel: BookSearchViewModel = hiltViewModel()) {
 
     Scaffold(
         topBar = {
@@ -100,12 +67,13 @@ fun SearchScreen(navController: NavHostController) {
                 SearchForm(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Log.d("TAG", "SearchScreen: $it")
+                        .padding(16.dp),
+                    viewModel
+                ) {query ->
+                    viewModel.searchBooks(query)
                 }
 
-                BookList(bookList = listOfBooks, navController = navController)
+                BookList(navController = navController)
 
             }
         }
@@ -115,7 +83,7 @@ fun SearchScreen(navController: NavHostController) {
 
 @Composable
 fun BookList(
-    bookList: List<MBook>,
+    bookList: List<MBook> = emptyList(),
     navController: NavHostController
 ) {
     LazyColumn (modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)){
@@ -161,6 +129,7 @@ fun BookItem(mBook: MBook, onItemClicked: () -> Unit) {
 @Composable
 fun SearchForm(
     modifier: Modifier = Modifier,
+    viewModel: BookSearchViewModel,
     loading: Boolean = false,
     hint: String = "Search",
     onSearch: (String) -> Unit = {}
