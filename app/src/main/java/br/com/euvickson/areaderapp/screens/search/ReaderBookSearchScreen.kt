@@ -92,7 +92,7 @@ fun BookList(
     val listOfBooks = viewModel.list
 
     if (viewModel.isLoading) {
-        LinearProgressIndicator()
+        LinearProgressIndicator(modifier = Modifier.padding(18.dp).fillMaxWidth())
     } else {
         LazyColumn (modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)){
             items(listOfBooks) { book ->
@@ -128,8 +128,8 @@ fun BookItem(book: Item, onItemClicked: () -> Unit) {
             Column (horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center) {
                 Text(text = book.volumeInfo.title, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Text(text = "Author: ${book.volumeInfo.authors}", style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.padding(start = 4.dp))
-                Text(text = book.volumeInfo.publishedDate, style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = book.volumeInfo.language, style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = "Date: ${book.volumeInfo.publishedDate}", style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(text = book.volumeInfo.categories.toString(), style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
             }
 
         }
