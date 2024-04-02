@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -90,13 +91,18 @@ fun BookList(
 ) {
     val listOfBooks = viewModel.list
 
-    LazyColumn (modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)){
-        items(listOfBooks) { book ->
-            BookItem(book) {
-                Log.d("TAG", "BookList: $book")
+    if (viewModel.isLoading) {
+        LinearProgressIndicator()
+    } else {
+        LazyColumn (modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)){
+            items(listOfBooks) { book ->
+                BookItem(book) {
+                    Log.d("TAG", "BookList: $book")
+                }
             }
         }
     }
+
 }
 
 @Composable
