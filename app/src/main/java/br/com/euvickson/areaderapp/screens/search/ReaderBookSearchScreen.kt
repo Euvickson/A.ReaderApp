@@ -43,11 +43,15 @@ import androidx.navigation.NavHostController
 import br.com.euvickson.areaderapp.components.InputField
 import br.com.euvickson.areaderapp.components.ReaderAppBar
 import br.com.euvickson.areaderapp.model.Item
+import br.com.euvickson.areaderapp.navigation.ReaderScreens
 import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(navController: NavHostController, viewModel: BookSearchViewModel = hiltViewModel()) {
+fun SearchScreen(
+    navController: NavHostController,
+    viewModel: BookSearchViewModel = hiltViewModel()
+) {
 
     Scaffold(
         topBar = {
@@ -70,7 +74,7 @@ fun SearchScreen(navController: NavHostController, viewModel: BookSearchViewMode
                         .fillMaxWidth()
                         .padding(16.dp),
                     viewModel
-                ) {searchQuery ->
+                ) { searchQuery ->
                     viewModel.searchBooks(searchQuery)
                 }
 
@@ -92,12 +96,14 @@ fun BookList(
     val listOfBooks = viewModel.list
 
     if (viewModel.isLoading) {
-        LinearProgressIndicator(modifier = Modifier.padding(18.dp).fillMaxWidth())
+        LinearProgressIndicator(modifier = Modifier
+            .padding(18.dp)
+            .fillMaxWidth())
     } else {
-        LazyColumn (modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)){
+        LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
             items(listOfBooks) { book ->
-                BookItem(book) {
-                    Log.d("TAG", "BookList: $book")
+                BookItem(book) { bookId ->
+                    navController.navigate(ReaderScreens.DetailScreen.name + "/${bookId}")
                 }
             }
         }
@@ -106,16 +112,21 @@ fun BookList(
 }
 
 @Composable
-fun BookItem(book: Item, onItemClicked: () -> Unit) {
-    Card (
+fun BookItem(book: Item, onItemClicked: (String) -> Unit) {
+    Card(
         elevation = CardDefaults.cardElevation(8.dp),
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 4.dp)
             .fillMaxWidth()
-            .clickable { onItemClicked.invoke() },
-    ){
-        Row (horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(8.dp)) {
-            val imageUrl: String = book.volumeInfo.imageLinks.smallThumbnail.ifEmpty { "http://books.google.com/books/content?id=-1y8CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api" }
+            .clickable { onItemClicked.invoke(book.id) },
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(8.dp)
+        ) {
+            val imageUrl: String =
+                book.volumeInfo.imageLinks.smallThumbnail.ifEmpty { "http://books.google.com/books/content?id=-1y8CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api" }
             Image(
                 painter = rememberAsyncImagePainter(model = imageUrl),
                 contentDescription = "Image",
@@ -125,11 +136,35 @@ fun BookItem(book: Item, onItemClicked: () -> Unit) {
                     .padding(8.dp)
             )
 
-            Column (horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Center) {
-                Text(text = book.volumeInfo.title, style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = "Author: ${book.volumeInfo.authors}", style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Clip, modifier = Modifier.padding(start = 4.dp))
-                Text(text = "Date: ${book.volumeInfo.publishedDate}", style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
-                Text(text = book.volumeInfo.categories.toString(), style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic), maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Column(
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = book.volumeInfo.title,
+                    style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = "Author: ${book.volumeInfo.authors}",
+                    style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic),
+                    maxLines = 1,
+                    overflow = TextOverflow.Clip,
+                    modifier = Modifier.padding(start = 4.dp)
+                )
+                Text(
+                    text = "Date: ${book.volumeInfo.publishedDate}",
+                    style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                Text(
+                    text = book.volumeInfo.categories.toString(),
+                    style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
 
         }
