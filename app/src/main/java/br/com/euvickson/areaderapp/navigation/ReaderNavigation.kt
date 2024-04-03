@@ -10,6 +10,7 @@ import androidx.navigation.navArgument
 import br.com.euvickson.areaderapp.screens.ReaderSplashScreen
 import br.com.euvickson.areaderapp.screens.details.BookDetailsScreen
 import br.com.euvickson.areaderapp.screens.home.Home
+import br.com.euvickson.areaderapp.screens.home.HomeScreenViewModel
 import br.com.euvickson.areaderapp.screens.login.ReaderLoginScreen
 import br.com.euvickson.areaderapp.screens.search.BookSearchViewModel
 import br.com.euvickson.areaderapp.screens.search.SearchScreen
@@ -27,7 +28,8 @@ fun ReaderNavigation() {
         }
 
         composable(ReaderScreens.ReaderHomeScreen.name) {
-            Home(navController = navController)
+            val homeViewModel = hiltViewModel<HomeScreenViewModel>()
+            Home(navController = navController, viewModel = homeViewModel)
         }
 
         composable(ReaderScreens.SearchScreen.name) {

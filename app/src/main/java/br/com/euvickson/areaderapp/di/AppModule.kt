@@ -2,7 +2,9 @@ package br.com.euvickson.areaderapp.di
 
 import br.com.euvickson.areaderapp.network.BooksApi
 import br.com.euvickson.areaderapp.repository.BookRepository
+import br.com.euvickson.areaderapp.repository.FireRepository
 import br.com.euvickson.areaderapp.utils.Constants.BASE_URL
+import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,4 +30,8 @@ object AppModule {
     @Singleton
     @Provides
     fun provideBookRepository(api: BooksApi) = BookRepository(api)
+
+    @Singleton
+    @Provides
+    fun provideFireBookRepository() = FireRepository(queryBook = FirebaseFirestore.getInstance().collection("books"))
 }

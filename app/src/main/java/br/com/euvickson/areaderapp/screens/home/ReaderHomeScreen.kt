@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Divider
@@ -30,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import br.com.euvickson.areaderapp.components.FABContent
@@ -42,7 +42,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Home(navController: NavHostController) {
+fun Home(navController: NavHostController, viewModel: HomeScreenViewModel = hiltViewModel()) {
 
     Scaffold(
         topBar = {
@@ -60,48 +60,25 @@ fun Home(navController: NavHostController) {
                 .fillMaxSize()
                 .padding(it)
         ) {
-            HomeContent(navController = navController)
+            HomeContent(navController = navController, viewModel = viewModel)
         }
 
     }
 }
 
 @Composable
-fun HomeContent(navController: NavController) {
+fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
 
-    val listOfBooks = listOf(
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
-        MBook(
-            id = "dafa",
-            title = "Hello Again",
-            authors = "All of Us",
-            notes = null
-        ),
+    var listOfBooks = emptyList<MBook>()
+    val currentUser = FirebaseAuth.getInstance().currentUser
 
-    )
+    if (!viewModel.data.value.data.isNullOrEmpty()) {
+        listOfBooks = viewModel.data.value.data!!.toList().filter { mBook ->
+            mBook.userId == currentUser?.uid.toString()
+        }
+
+    }
+
 
     val currentUserName = if (!FirebaseAuth.getInstance().currentUser?.email.isNullOrEmpty()) {
         FirebaseAuth.getInstance().currentUser?.email?.split("@")?.get(0)
