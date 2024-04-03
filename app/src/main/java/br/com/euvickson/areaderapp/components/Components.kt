@@ -272,12 +272,7 @@ fun BookRating(score: Double = 4.5) {
 
 @Composable
 fun ListCard(
-    book: MBook = MBook(
-        "asdf",
-        "Runnig",
-        "Me And You",
-        "Hello World"
-    ),
+    book: MBook,
     onPressDetails: (String) -> Unit = {}
 ) {
     val context = LocalContext.current
@@ -302,7 +297,7 @@ fun ListCard(
             Row (horizontalArrangement = Arrangement.Center) {
 
                 Image(
-                    painter = rememberAsyncImagePainter(model = "http://books.google.com/books/content?id=-1y8CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api"),
+                    painter = rememberAsyncImagePainter(model = book.photoUrl.toString()),
                     contentDescription = "book image",
                     modifier = Modifier
                         .height(140.dp)
@@ -331,13 +326,17 @@ fun ListCard(
 
             Text(text = book.title.toString(),
                 modifier = Modifier.padding(4.dp),
+                style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis)
 
             Text(text = book.authors.toString(),
                 modifier = Modifier.padding(4.dp),
-                style = MaterialTheme.typography.labelMedium)
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodySmall)
 
         }
 

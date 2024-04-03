@@ -75,24 +75,26 @@ fun BookDetailsScreen(
                 .padding(3.dp)
                 .fillMaxSize()
         ) {
-            Column(
+            LazyColumn(
                 modifier = Modifier.padding(top = 12.dp),
                 verticalArrangement = Arrangement.Top,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                //A different way to get the Resource from the API. Instead of using a variable in the View Model, it can be called using the Produce State
-                val bookInfo = produceState<Resource<Item>>(initialValue = Resource.Loading()) {
-                    value = viewModel.getBookInfo(bookId = bookId)
-                }.value
+                item {
+                    //A different way to get the Resource from the API. Instead of using a variable in the View Model, it can be called using the Produce State
+                    val bookInfo = produceState<Resource<Item>>(initialValue = Resource.Loading()) {
+                        value = viewModel.getBookInfo(bookId = bookId)
+                    }.value
 
-                if (bookInfo.data == null) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth()
-                    )
-                } else {
-                    ShowDetails(bookInfo, navController)
+                    if (bookInfo.data == null) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .padding(8.dp)
+                                .fillMaxWidth()
+                        )
+                    } else {
+                        ShowDetails(bookInfo, navController)
+                    }
                 }
 
             }
@@ -154,7 +156,7 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(5.dp))
 
-        val cleaDescription = HtmlCompat.fromHtml(
+        val clearDescription = HtmlCompat.fromHtml(
             bookData!!.description,
             HtmlCompat.FROM_HTML_MODE_LEGACY
         ).toString()
@@ -163,7 +165,7 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
 
         Surface(
             modifier = Modifier
-                .height(localDims.heightPixels.dp.times(0.15f))
+                .height(localDims.heightPixels.dp.times(0.12f))
                 .padding(4.dp),
             shape = RectangleShape,
             border = BorderStroke(1.dp, color = Color.LightGray)
@@ -171,7 +173,7 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
 
             LazyColumn(modifier = Modifier.padding(3.dp)) {
                 item {
-                    Text(text = cleaDescription)
+                    Text(text = clearDescription)
                 }
             }
         }

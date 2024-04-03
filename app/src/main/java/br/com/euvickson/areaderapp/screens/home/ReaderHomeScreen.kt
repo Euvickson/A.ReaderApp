@@ -69,6 +69,7 @@ fun Home(navController: NavHostController, viewModel: HomeScreenViewModel = hilt
 @Composable
 fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
 
+    viewModel.getAllBooksFromDatabase()
     var listOfBooks = emptyList<MBook>()
     val currentUser = FirebaseAuth.getInstance().currentUser
 
@@ -118,8 +119,6 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
             }
 
         }
-
-        ListCard()
 
         ReadingRightNowArea(books = listOfBooks, navController = navController)
     }
