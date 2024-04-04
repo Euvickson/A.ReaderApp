@@ -133,8 +133,7 @@ fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
 @Composable
 fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
     HorizontalScrollableComponent(listOfBooks) {
-        Log.d("TAG", "BookListArea: $it")
-        //Todo: On Card Clicked, navigate to Details
+        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
 }
 
@@ -149,7 +148,7 @@ fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (Stri
 
         items(listOfBooks) {book ->
             ListCard(book) {
-                onCardPressed(it)
+                onCardPressed(book.googleBookId.toString())
             }
         }
     }
