@@ -1,7 +1,7 @@
 package br.com.euvickson.areaderapp.screens.update
 
-import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,11 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -26,22 +26,27 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import br.com.euvickson.areaderapp.components.InputField
 import br.com.euvickson.areaderapp.components.ReaderAppBar
 import br.com.euvickson.areaderapp.data.DataOrException
 import br.com.euvickson.areaderapp.model.MBook
 import br.com.euvickson.areaderapp.screens.home.HomeScreenViewModel
 import coil.compose.rememberAsyncImagePainter
-import coil.compose.rememberImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,6 +92,11 @@ fun BookUpdateScreen(navController: NavHostController, bookItemId: String, viewM
                     ){
                         ShowBookUpdate(bookInfo = viewModel.data.value, bookItemId = bookItemId)
                     }
+
+                    ShowSimpleForm(book = viewModel.data.value.data?.first {mBook ->
+                        mBook.googleBookId == bookItemId
+                    }!!, navController = navController)
+
                 }
 
             }
@@ -95,6 +105,52 @@ fun BookUpdateScreen(navController: NavHostController, bookItemId: String, viewM
 
     }
     
+}
+
+@Composable
+fun ShowSimpleForm(book: MBook, navController: NavHostController) {
+
+    val notesText = remember { mutableStateOf("") }
+
+    SimpleForm(defaultValue = book.notes.toString().ifEmpty { "No Thoughts available." }) { note ->
+        notesText.value = note
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun SimpleForm(
+    modifier: Modifier = Modifier,
+    loading: Boolean = false,
+    defaultValue: String = "Great Book",
+    onSearch: (String) -> Unit
+) {
+    Column {
+        val textFieldValue = rememberSaveable { mutableStateOf(defaultValue) }
+        val keyboardController = LocalSoftwareKeyboardController.current
+        val valid = remember (textFieldValue.value) { textFieldValue.value.trim().isNotEmpty() }
+
+        InputField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(140.dp)
+                .padding(3.dp)
+                .background(color = MaterialTheme.colorScheme.onSecondary, shape = CircleShape)
+                .padding(
+                    horizontal = 20.dp,
+                    vertical = 12.dp
+                ),
+            valueState = textFieldValue,
+            labelId = "Enter Your Thoughts",
+            enabled = true,
+            onAction = KeyboardActions {
+                if (!valid) return@KeyboardActions
+                onSearch(textFieldValue.value.trim())
+                keyboardController?.hide()
+            }
+        )
+
+    }
 }
 
 @Composable
