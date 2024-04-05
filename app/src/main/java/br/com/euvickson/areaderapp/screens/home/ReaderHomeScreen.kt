@@ -16,9 +16,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -26,6 +28,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,13 +95,13 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
     Column(
         modifier = Modifier.padding(2.dp),
         verticalArrangement = Arrangement.Top
-    ){
-        Row (modifier = Modifier.align(alignment = Alignment.Start)){
+    ) {
+        Row(modifier = Modifier.align(alignment = Alignment.Start)) {
             TitleSection(label = "Your reading \n " + "activity right now")
-            
+
             Spacer(modifier = Modifier.fillMaxWidth(fraction = 0.7f))
 
-            Column (horizontalAlignment = Alignment.CenterHorizontally){
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
                     imageVector = Icons.Filled.AccountCircle,
                     contentDescription = "Profile",
@@ -108,49 +113,82 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
                     tint = MaterialTheme.colorScheme.secondary
                 )
 
-                Text(text = currentUserName!!,
+                Text(
+                    text = currentUserName!!,
                     modifier = Modifier.padding(2.dp),
                     style = MaterialTheme.typography.displaySmall,
                     fontSize = 15.sp,
                     maxLines = 1,
-                    overflow = TextOverflow.Clip)
+                    overflow = TextOverflow.Clip
+                )
 
                 Divider()
             }
 
         }
-
-        ReadingRightNowArea(books = listOfBooks, navController = navController)
+        ReadingRightNowArea(listOfBooks = listOfBooks, navController = navController)
+        BookListArea(books = listOfBooks, navController = navController)
     }
 }
 
 @Composable
-fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
-    TitleSection(label = "Reading List")
-    BookListArea(listOfBooks = books, navController = navController)
-}
+fun BookListArea(books: List<MBook>, navController: NavController) {
 
-@Composable
-fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
-    HorizontalScrollableComponent(listOfBooks) {
+    val readingNowList = books.filter { mBook ->
+        mBook.startedReading != null && mBook.finishedReading == null
+    }
+
+    TitleSection(label = "Reading List")
+    HorizontalScrollableComponent(listOfBooks = readingNowList) {
         navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
 }
 
 @Composable
-fun HorizontalScrollableComponent(listOfBooks: List<MBook>, onCardPressed: (String) -> Unit) {
+fun ReadingRightNowArea(listOfBooks: List<MBook>, navController: NavController) {
+
+    val addedBooks = listOfBooks.filter { mBook ->
+        mBook.startedReading == null && mBook.finishedReading == null
+    }
+
+    HorizontalScrollableComponent(addedBooks) {
+        navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
+    }
+}
+
+@Composable
+fun HorizontalScrollableComponent(
+    listOfBooks: List<MBook>,
+    viewModel: HomeScreenViewModel = hiltViewModel(),
+    onCardPressed: (String) -> Unit
+) {
     val scrollState = rememberLazyListState()
 
-    LazyRow (modifier = Modifier
-        .fillMaxWidth()
-        .height(280.dp),
-        state = scrollState) {
+    LazyRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(280.dp),
+        state = scrollState
+    ) {
 
-        items(listOfBooks) {book ->
-            ListCard(book) {
-                onCardPressed(book.googleBookId.toString())
+        if (listOfBooks.isEmpty()) {
+            item {
+                Surface(modifier = Modifier.padding(23.dp)) {
+                    Text(
+                        text = "No Books Found. Add a Book", style = TextStyle(
+                            color = Color.Red,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp
+                        )
+                    )
+                }
+            }
+        } else {
+            items(listOfBooks) { book ->
+                ListCard(book) {
+                    onCardPressed(book.googleBookId.toString())
+                }
             }
         }
     }
-
 }
