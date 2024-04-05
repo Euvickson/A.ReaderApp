@@ -1,7 +1,9 @@
 package br.com.euvickson.areaderapp.screens.update
 
+import android.content.Context
 import android.util.Log
 import android.view.MotionEvent
+import android.widget.Toast
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.spring
@@ -23,6 +25,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +37,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
@@ -47,19 +51,23 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import br.com.euvickson.areaderapp.R
 import br.com.euvickson.areaderapp.components.InputField
 import br.com.euvickson.areaderapp.components.ReaderAppBar
 import br.com.euvickson.areaderapp.components.RoundedButton
 import br.com.euvickson.areaderapp.data.DataOrException
 import br.com.euvickson.areaderapp.model.MBook
 import br.com.euvickson.areaderapp.screens.home.HomeScreenViewModel
+import br.com.euvickson.areaderapp.utils.formatDate
 import coil.compose.rememberAsyncImagePainter
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
@@ -144,6 +152,8 @@ fun BookUpdateScreen(
 @Composable
 fun ShowSimpleForm(book: MBook, navController: NavHostController) {
 
+    val context = LocalContext.current
+
     val notesText = remember { mutableStateOf("") }
 
     val isStartedReading = remember {
@@ -181,7 +191,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
                     )
                 }
             } else {
-                Text(text = "Started on: ${book.startedReading}") //todo: Format Date
+                Text(text = "Started on: ${formatDate(book.startedReading!!)}")
             }
         }
 
@@ -197,7 +207,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
                         color = Color.Red)
                 }
             } else {
-                Text(text = "Finished on: ${book.finishedReading}") //todo: Format Date
+                Text(text = "Finished on: ${formatDate(book.finishedReading!!)}")
             }
 
         }
@@ -234,11 +244,14 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
                     .collection("books")
                     .document(book.id!!)
                     .update(bookToUpdate)
-                    .addOnCompleteListener {task ->
-                        Log.d("Complete", "ShowSimpleForm: ${task.result}")
+                    .addOnCompleteListener {
+                        showToast(context, "Book Updated Successfully!")
+                        navController.popBackStack()
                     }.addOnFailureListener {
                         Log.w("Error", "Error updating Document", it)
                     }
+            } else {
+                navController.popBackStack()
             }
 
 
@@ -246,12 +259,55 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
 
         Spacer(Modifier.width(100.dp))
 
+        val openDialog = remember { mutableStateOf(false) }
+
+        if (openDialog.value) {
+            ShowAlertDialog(message = stringResource(id = R.string.sure) + "\n" + stringResource(id = R.string.action), openDialog = openDialog) {
+                FirebaseFirestore.getInstance().collection("books").document(book.id!!).delete().addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        openDialog.value = false
+                        navController.popBackStack()
+                    }
+                }
+            }
+        }
+
         RoundedButton(
             label = "Delete"
         ) {
-
+            openDialog.value = true
         }
     }
+}
+
+@Composable
+fun ShowAlertDialog(
+    message: String,
+    openDialog: MutableState<Boolean>,
+    onYesPressed: () -> Unit
+) {
+    if (openDialog.value) {
+        AlertDialog(
+            onDismissRequest = { openDialog.value = false },
+            title = { Text(text = "Delete Book") },
+            text = { Text(text = message)},
+            confirmButton = {
+                    TextButton(onClick = { onYesPressed.invoke() }) {
+                        Text(text = "Yes")
+                    }
+            },
+            dismissButton = {
+                TextButton(onClick = { openDialog.value = false }) {
+                    Text(text = "No")
+                }
+            }
+        )
+    }
+}
+
+fun showToast(context: Context, message: String) {
+    Toast.makeText(context, message, Toast.LENGTH_LONG)
+        .show()
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
