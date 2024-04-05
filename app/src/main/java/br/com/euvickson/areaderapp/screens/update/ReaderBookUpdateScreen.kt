@@ -1,5 +1,6 @@
 package br.com.euvickson.areaderapp.screens.update
 
+import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateDpAsState
@@ -55,10 +56,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import br.com.euvickson.areaderapp.components.InputField
 import br.com.euvickson.areaderapp.components.ReaderAppBar
+import br.com.euvickson.areaderapp.components.RoundedButton
 import br.com.euvickson.areaderapp.data.DataOrException
 import br.com.euvickson.areaderapp.model.MBook
 import br.com.euvickson.areaderapp.screens.home.HomeScreenViewModel
 import coil.compose.rememberAsyncImagePainter
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.FirebaseFirestore
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -203,6 +207,50 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
 
     RatingBar(rating = book.rating!!.toInt()) {rating ->
         ratingVal.value = rating
+    }
+
+    Spacer(modifier = Modifier.padding(bottom = 15.dp))
+
+    Row (){
+
+        val changedNotes = book.notes != notesText.value
+        val changedRating = book.rating?.toInt() != ratingVal.value
+        val isFinishedTimeStamp = if (isFinishedReading.value) Timestamp.now() else book.finishedReading
+        val isStartedTimeStamp = if (isStartedReading.value) Timestamp.now() else book.startedReading
+        val bookUpdate = changedNotes || changedRating || isStartedReading.value || isFinishedReading.value
+
+        val bookToUpdate = hashMapOf(
+            "finished_reading_at" to isFinishedTimeStamp,
+            "started_reading_at" to isStartedTimeStamp,
+            "rating" to ratingVal.value,
+            "notes" to notesText.value
+        ).toMap()
+
+        RoundedButton(
+            label = "Update"
+        ) {
+            if (bookUpdate) {
+                FirebaseFirestore.getInstance()
+                    .collection("books")
+                    .document(book.id!!)
+                    .update(bookToUpdate)
+                    .addOnCompleteListener {task ->
+                        Log.d("Complete", "ShowSimpleForm: ${task.result}")
+                    }.addOnFailureListener {
+                        Log.w("Error", "Error updating Document", it)
+                    }
+            }
+
+
+        }
+
+        Spacer(Modifier.width(100.dp))
+
+        RoundedButton(
+            label = "Delete"
+        ) {
+
+        }
     }
 }
 
