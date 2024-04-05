@@ -1,6 +1,5 @@
 package br.com.euvickson.areaderapp.screens.home
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,11 +15,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -126,31 +123,31 @@ fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
             }
 
         }
-        ReadingRightNowArea(listOfBooks = listOfBooks, navController = navController)
-        BookListArea(books = listOfBooks, navController = navController)
+        ReadingRightNowArea(books = listOfBooks, navController = navController)
+        BookListArea(listOfBooks = listOfBooks, navController = navController)
     }
 }
 
 @Composable
-fun BookListArea(books: List<MBook>, navController: NavController) {
+fun ReadingRightNowArea(books: List<MBook>, navController: NavController) {
 
     val readingNowList = books.filter { mBook ->
         mBook.startedReading != null && mBook.finishedReading == null
     }
 
-    TitleSection(label = "Reading List")
     HorizontalScrollableComponent(listOfBooks = readingNowList) {
         navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
 }
 
 @Composable
-fun ReadingRightNowArea(listOfBooks: List<MBook>, navController: NavController) {
+fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
 
     val addedBooks = listOfBooks.filter { mBook ->
         mBook.startedReading == null && mBook.finishedReading == null
     }
 
+    TitleSection(label = "Reading List")
     HorizontalScrollableComponent(addedBooks) {
         navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
