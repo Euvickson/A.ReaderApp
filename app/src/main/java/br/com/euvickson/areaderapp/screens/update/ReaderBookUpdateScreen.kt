@@ -1,5 +1,9 @@
 package br.com.euvickson.areaderapp.screens.update
 
+import android.view.MotionEvent
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,9 +21,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,18 +33,19 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -143,6 +150,8 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
         mutableStateOf(false)
     }
 
+    val ratingVal = remember { mutableStateOf(0) }
+
     SimpleForm(defaultValue = book.notes.toString().ifEmpty { "No Thoughts available." }) { note ->
         notesText.value = note
     }
@@ -189,6 +198,12 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
 
         }
     }
+
+    Text(text = "Rating", modifier = Modifier.padding(bottom = 3.dp))
+
+    RatingBar(rating = book.rating!!.toInt()) {rating ->
+        ratingVal.value = rating
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -232,7 +247,9 @@ fun ShowBookUpdate(bookInfo: DataOrException<List<MBook>, Boolean, Exception>, b
     Row {
 
         if (bookInfo.data != null) {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.onSecondary).padding(4.dp), verticalArrangement = Arrangement.Center) {
+            Column(modifier = Modifier
+                .background(MaterialTheme.colorScheme.onSecondary)
+                .padding(4.dp), verticalArrangement = Arrangement.Center) {
 
                 CardListItem(book = bookInfo.data!!.first { mBook ->
                     mBook.googleBookId == bookItemId
@@ -321,4 +338,55 @@ fun CardListItem(book: MBook, onPressDetails: () -> Unit) {
             }
         }
     }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun RatingBar(
+    modifier: Modifier = Modifier,
+    rating:Int,
+    onPressRating: (Int) -> Unit
+) {
+
+    var ratingState by remember { mutableStateOf(rating) }
+    
+    var selected by remember { mutableStateOf(false) }
+    
+    val size by animateDpAsState(
+        targetValue = if (selected) 42.dp else 34.dp,
+        spring(Spring.DampingRatioMediumBouncy)
+    )
+
+    Row (
+        modifier = Modifier.width(280.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ){
+        for (i in 1..5) {
+            Icon(
+                imageVector = Icons.Default.Star,
+                contentDescription = "star",
+                modifier = modifier
+                    .width(size)
+                    .height(size)
+                    .pointerInteropFilter {
+                        when (it.action) {
+                            MotionEvent.ACTION_DOWN -> {
+                                selected = true
+                                onPressRating(i)
+                                ratingState = i
+                            }
+
+                            MotionEvent.ACTION_UP -> {
+                                selected = false
+                            }
+                        }
+                        true
+                    },
+                tint = if (i <= ratingState) Color(0xFFFF8C00) else Color.LightGray
+            )
+        }
+
+    }
+
 }
