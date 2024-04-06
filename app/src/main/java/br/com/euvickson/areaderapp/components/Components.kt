@@ -37,6 +37,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -294,7 +296,7 @@ fun ListCard(
 
         Column (modifier = Modifier.width(screenWidth.dp - (spacing * 2)), horizontalAlignment = Alignment.Start){
 
-            Row (horizontalArrangement = Arrangement.Center) {
+            Row (horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.Top) {
 
                 Image(
                     painter = rememberAsyncImagePainter(model = book.photoUrl.toString()),
@@ -340,11 +342,19 @@ fun ListCard(
 
         }
 
+        val isStartedReading = remember {
+            mutableStateOf(false)
+        }
+
         Row (
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.Bottom){
-            RoundedButton(label = "Reading", radius = 70)
+            isStartedReading.value = book.startedReading != null
+            RoundedButton(
+                label = if (isStartedReading.value) "Reading" else "Not Started",
+                radius = 70
+            )
 
         }
 

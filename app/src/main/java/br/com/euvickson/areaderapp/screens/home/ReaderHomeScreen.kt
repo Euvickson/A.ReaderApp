@@ -147,7 +147,7 @@ fun BookListArea(listOfBooks: List<MBook>, navController: NavController) {
         mBook.startedReading == null && mBook.finishedReading == null
     }
 
-    TitleSection(label = "Reading List")
+    TitleSection(label = "Books Not Started")
     HorizontalScrollableComponent(addedBooks) {
         navController.navigate(ReaderScreens.UpdateScreen.name + "/$it")
     }
