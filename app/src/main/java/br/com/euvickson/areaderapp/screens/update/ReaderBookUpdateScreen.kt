@@ -39,6 +39,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
@@ -66,6 +67,7 @@ import br.com.euvickson.areaderapp.components.ReaderAppBar
 import br.com.euvickson.areaderapp.components.RoundedButton
 import br.com.euvickson.areaderapp.data.DataOrException
 import br.com.euvickson.areaderapp.model.MBook
+import br.com.euvickson.areaderapp.navigation.ReaderScreens
 import br.com.euvickson.areaderapp.screens.home.HomeScreenViewModel
 import br.com.euvickson.areaderapp.utils.formatDate
 import coil.compose.rememberAsyncImagePainter
@@ -164,7 +166,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
         mutableStateOf(false)
     }
 
-    val ratingVal = remember { mutableStateOf(0) }
+    val ratingVal = remember { mutableIntStateOf(0) }
 
     SimpleForm(defaultValue = book.notes.toString().ifEmpty { "No Thoughts available." }) { note ->
         notesText.value = note
@@ -216,15 +218,15 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
     Text(text = "Rating", modifier = Modifier.padding(bottom = 3.dp))
 
     RatingBar(rating = book.rating!!.toInt()) {rating ->
-        ratingVal.value = rating
+        ratingVal.intValue = rating
     }
 
     Spacer(modifier = Modifier.padding(bottom = 15.dp))
 
-    Row (){
+    Row {
 
         val changedNotes = book.notes != notesText.value
-        val changedRating = book.rating?.toInt() != ratingVal.value
+        val changedRating = book.rating?.toInt() != ratingVal.intValue
         val isFinishedTimeStamp = if (isFinishedReading.value) Timestamp.now() else book.finishedReading
         val isStartedTimeStamp = if (isStartedReading.value) Timestamp.now() else book.startedReading
         val bookUpdate = changedNotes || changedRating || isStartedReading.value || isFinishedReading.value
@@ -232,7 +234,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
         val bookToUpdate = hashMapOf(
             "finished_reading_at" to isFinishedTimeStamp,
             "started_reading_at" to isStartedTimeStamp,
-            "rating" to ratingVal.value,
+            "rating" to ratingVal.intValue,
             "notes" to notesText.value
         ).toMap()
 
@@ -246,7 +248,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
                     .update(bookToUpdate)
                     .addOnCompleteListener {
                         showToast(context, "Book Updated Successfully!")
-                        navController.popBackStack()
+                        navController.navigate(ReaderScreens.ReaderHomeScreen.name)
                     }.addOnFailureListener {
                         Log.w("Error", "Error updating Document", it)
                     }
@@ -266,7 +268,7 @@ fun ShowSimpleForm(book: MBook, navController: NavHostController) {
                 FirebaseFirestore.getInstance().collection("books").document(book.id!!).delete().addOnCompleteListener {
                     if (it.isSuccessful) {
                         openDialog.value = false
-                        navController.popBackStack()
+                        navController.navigate(ReaderScreens.ReaderHomeScreen.name)
                     }
                 }
             }
@@ -313,8 +315,6 @@ fun showToast(context: Context, message: String) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun SimpleForm(
-    modifier: Modifier = Modifier,
-    loading: Boolean = false,
     defaultValue: String = "Great Book",
     onSearch: (String) -> Unit
 ) {
@@ -357,7 +357,7 @@ fun ShowBookUpdate(bookInfo: DataOrException<List<MBook>, Boolean, Exception>, b
 
                 CardListItem(book = bookInfo.data!!.first { mBook ->
                     mBook.googleBookId == bookItemId
-                }, onPressDetails = {})
+                })
 
             }
         }
@@ -366,7 +366,7 @@ fun ShowBookUpdate(bookInfo: DataOrException<List<MBook>, Boolean, Exception>, b
 }
 
 @Composable
-fun CardListItem(book: MBook, onPressDetails: () -> Unit) {
+fun CardListItem(book: MBook) {
     Card(
         modifier = Modifier
             .padding(
@@ -452,13 +452,13 @@ fun RatingBar(
     onPressRating: (Int) -> Unit
 ) {
 
-    var ratingState by remember { mutableStateOf(rating) }
+    var ratingState by remember { mutableIntStateOf(rating) }
     
     var selected by remember { mutableStateOf(false) }
     
     val size by animateDpAsState(
         targetValue = if (selected) 42.dp else 34.dp,
-        spring(Spring.DampingRatioMediumBouncy)
+        spring(Spring.DampingRatioMediumBouncy), label = ""
     )
 
     Row (

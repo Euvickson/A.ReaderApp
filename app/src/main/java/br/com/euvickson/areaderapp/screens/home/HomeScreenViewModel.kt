@@ -23,7 +23,7 @@ class HomeScreenViewModel @Inject constructor(private val repository: FireReposi
         getAllBooksFromDatabase()
     }
 
-    fun getAllBooksFromDatabase() {
+    private fun getAllBooksFromDatabase() {
 
         viewModelScope.launch {
             data.value.loading = true

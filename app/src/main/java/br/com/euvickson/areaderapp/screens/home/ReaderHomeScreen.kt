@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -71,7 +72,6 @@ fun Home(navController: NavHostController, viewModel: HomeScreenViewModel = hilt
 @Composable
 fun HomeContent(navController: NavController, viewModel: HomeScreenViewModel) {
 
-    viewModel.getAllBooksFromDatabase()
     var listOfBooks = emptyList<MBook>()
     val currentUser = FirebaseAuth.getInstance().currentUser
 
@@ -167,25 +167,31 @@ fun HorizontalScrollableComponent(
             .height(280.dp),
         state = scrollState
     ) {
-
-        if (listOfBooks.isEmpty()) {
+        if (viewModel.data.value.loading == true) {
             item {
-                Surface(modifier = Modifier.padding(23.dp)) {
-                    Text(
-                        text = "No Books Found. Add a Book", style = TextStyle(
-                            color = Color.Red,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp
-                        )
-                    )
-                }
+                LinearProgressIndicator(modifier = Modifier.padding(8.dp).fillMaxWidth())
             }
         } else {
-            items(listOfBooks) { book ->
-                ListCard(book) {
-                    onCardPressed(book.googleBookId.toString())
+            if (listOfBooks.isEmpty()) {
+                item {
+                    Surface(modifier = Modifier.padding(23.dp)) {
+                        Text(
+                            text = "No Books Found. Add a Book", style = TextStyle(
+                                color = Color.Red,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp
+                            )
+                        )
+                    }
+                }
+            } else {
+                items(listOfBooks) { book ->
+                    ListCard(book) {
+                        onCardPressed(book.googleBookId.toString())
+                    }
                 }
             }
         }
+
     }
 }

@@ -108,7 +108,7 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
     val bookData = bookInfo.data?.volumeInfo
     val googleBookId = bookInfo.data?.id
 
-    Column (horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Card(
             modifier = Modifier.padding(34.dp),
             shape = CircleShape,
@@ -155,6 +155,7 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
         )
 
         Spacer(modifier = Modifier.height(5.dp))
+
 
         val clearDescription = HtmlCompat.fromHtml(
             bookData!!.description,
@@ -206,7 +207,11 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
                     saveToFirebase(book, navController)
                     Toast.makeText(context, "Book Saved", Toast.LENGTH_SHORT).show()
                 } catch (e: Exception) {
-                    Toast.makeText(context, "Error saving book. Try Again Latter", Toast.LENGTH_LONG).show()
+                    Toast.makeText(
+                        context,
+                        "Error saving book. Try Again Latter",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
 
             }
@@ -234,7 +239,7 @@ fun saveToFirebase(book: MBook, navController: NavController) {
             .addOnSuccessListener { documentRef ->
                 val docId = documentRef.id
                 dbCollection.document(docId).update(hashMapOf("id" to docId) as Map<String, Any>)
-                    .addOnCompleteListener {task ->
+                    .addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             navController.popBackStack()
                         }

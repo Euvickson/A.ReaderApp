@@ -1,9 +1,9 @@
 package br.com.euvickson.areaderapp.screens.search
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -61,7 +61,7 @@ fun SearchScreen(
                 showProfile = false,
                 navController = navController
             ) {
-                navController.popBackStack()
+                navController.navigate(ReaderScreens.ReaderHomeScreen.name)
             }
 
         }
@@ -93,20 +93,29 @@ fun BookList(
     navController: NavHostController,
     viewModel: BookSearchViewModel = hiltViewModel()
 ) {
-    val listOfBooks = viewModel.list
+
 
     if (viewModel.isLoading) {
         LinearProgressIndicator(modifier = Modifier
             .padding(18.dp)
             .fillMaxWidth())
     } else {
+
+        val listOfBooks = viewModel.list.ifEmpty {
+            emptyList()
+        }
         LazyColumn(modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)) {
-            items(listOfBooks) { book ->
-                BookItem(book) { bookId ->
-                    navController.navigate(ReaderScreens.DetailScreen.name + "/${bookId}")
+            if (listOfBooks.isEmpty()) {
+                item { Text(text = "Couldn't find what are you looking for") }
+            } else {
+                items(listOfBooks) { book ->
+                    BookItem(book) { bookId ->
+                        navController.navigate(ReaderScreens.DetailScreen.name + "/${bookId}")
+                    }
                 }
             }
         }
+
     }
 
 }
