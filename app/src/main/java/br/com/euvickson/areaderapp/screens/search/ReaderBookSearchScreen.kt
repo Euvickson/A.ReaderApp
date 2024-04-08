@@ -3,7 +3,6 @@ package br.com.euvickson.areaderapp.screens.search
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -134,8 +133,7 @@ fun BookItem(book: Item, onItemClicked: (String) -> Unit) {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(8.dp)
         ) {
-            val imageUrl: String =
-                book.volumeInfo.imageLinks.smallThumbnail.ifEmpty { "http://books.google.com/books/content?id=-1y8CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api" }
+            val imageUrl: String = if(book.volumeInfo?.imageLinks?.thumbnail != null) { book.volumeInfo.imageLinks.smallThumbnail } else { "http://books.google.com/books/content?id=-1y8CwAAQBAJ&printsec=frontcover&img=1&zoom=1&edge=curl&source=gbs_api" }
             Image(
                 painter = rememberAsyncImagePainter(model = imageUrl),
                 contentDescription = "Image",
@@ -150,26 +148,26 @@ fun BookItem(book: Item, onItemClicked: (String) -> Unit) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = book.volumeInfo.title,
+                    text = book.volumeInfo?.title.toString(),
                     style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = "Author: ${book.volumeInfo.authors}",
+                    text = "Author: ${book.volumeInfo?.authors}",
                     style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic),
                     maxLines = 1,
                     overflow = TextOverflow.Clip,
                     modifier = Modifier.padding(start = 4.dp)
                 )
                 Text(
-                    text = "Date: ${book.volumeInfo.publishedDate}",
+                    text = "Date: ${book.volumeInfo?.publishedDate}",
                     style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
                 Text(
-                    text = book.volumeInfo.categories.toString(),
+                    text = book.volumeInfo?.categories.toString(),
                     style = TextStyle(fontSize = 16.sp, fontStyle = FontStyle.Italic),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis

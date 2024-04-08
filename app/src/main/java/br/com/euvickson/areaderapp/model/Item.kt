@@ -8,5 +8,5 @@ data class Item(
     val saleInfo: SaleInfo,
     val searchInfo: SearchInfo,
     val selfLink: String,
-    val volumeInfo: VolumeInfo
+    val volumeInfo: VolumeInfo?
 )

@@ -115,7 +115,7 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
             elevation = CardDefaults.cardElevation(4.dp)
         ) {
             Image(
-                painter = rememberAsyncImagePainter(model = bookData!!.imageLinks.thumbnail),
+                painter = rememberAsyncImagePainter(model = bookData!!.imageLinks?.thumbnail),
                 contentDescription = "Book Image",
                 modifier = Modifier
                     .width(90.dp)
@@ -157,10 +157,12 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
         Spacer(modifier = Modifier.height(5.dp))
 
 
-        val clearDescription = HtmlCompat.fromHtml(
-            bookData!!.description,
-            HtmlCompat.FROM_HTML_MODE_LEGACY
-        ).toString()
+        val clearDescription = bookData!!.description?.let {
+            HtmlCompat.fromHtml(
+                it,
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            ).toString()
+        }
 
         val localDims = LocalContext.current.resources.displayMetrics
 
@@ -174,7 +176,7 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
 
             LazyColumn(modifier = Modifier.padding(3.dp)) {
                 item {
-                    Text(text = clearDescription)
+                    Text(text = clearDescription.toString())
                 }
             }
         }
@@ -196,7 +198,7 @@ fun ShowDetails(bookInfo: Resource<Item>, navController: NavHostController) {
                     description = bookData.description,
                     categories = bookData.categories.toString(),
                     notes = "",
-                    photoUrl = bookData.imageLinks.thumbnail,
+                    photoUrl = bookData.imageLinks?.thumbnail,
                     publishedDate = bookData.publishedDate,
                     pageCount = bookData.pageCount.toString(),
                     rating = 0.0,
